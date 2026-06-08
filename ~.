@@ -1,0 +1,6 @@
+set tabstop=2
+set expandtab
+set number
+set shiftwidth=2
+set exrc
+set secure

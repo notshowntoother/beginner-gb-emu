@@ -10,6 +10,8 @@ uint8_t opCycles[0xFF];
 uint8_t data[0x10000];
 uint8_t header[0x150];
 uint8_t* rom = nullptr;
+uint8_t mbcType = 0;
+size_t rom_size = 0;
 static const uint32_t CyclesPerFrame = 70224;
 int main() {
   using namespace std::chrono;
@@ -24,12 +26,12 @@ int main() {
   file.seekg(0);
   file.read((char*)header, 0x150);
   int rom_size_code = header[0x148];
-  size_t rom_size = 32768 * (1 << rom_size_code);
+  rom_size = 32768 * (1 << rom_size_code);
   rom = new uint8_t[rom_size];
   file.seekg(0);                    // go back to start
   file.read((char*)rom, rom_size);  // read entire ROM
   file.close();
-  uint8_t mbcType = header[0x147];
+  mbcType = header[0x147];
   switch(mbcType) {
     default:
       std::cerr<<"Son we dont have that yet sry";

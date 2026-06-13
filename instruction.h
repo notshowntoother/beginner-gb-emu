@@ -2,12 +2,13 @@
 #define GB_CYCLE_TABLE_HEADER
 #include <iostream>
 #include <stdexcept>
+#include "mbc.h"
 //write instructions
 //FDE(fetch, decode, execute)
 extern uint16_t PC;
 extern uint8_t data[];
 uint8_t inline fetchCOD() {
-  return data[PC++];
+  return getData(PC++);
 }
 //DE(decode, execute)
 uint8_t DE(uint8_t opcode) {

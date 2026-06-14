@@ -13,7 +13,7 @@ uint8_t inline fetchCOD() {
 //DE(decode, execute)
 uint8_t DE(uint8_t opcode) {
   switch(opcode) {
-    case0x00:
+    case 0x00:
       return 0x04;
     break;
     default:

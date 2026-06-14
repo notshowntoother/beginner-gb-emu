@@ -5,12 +5,50 @@ extern uint8_t data[];
 extern uint8_t mbcType;
 extern size_t rom_size;
 extern uint8_t* rom;
+extern uint8_t MBCFLAGS;
+extern uint8_t rom_bank;
+extern uint8_t bank_size; //PLACEHOLDER
+extern bool has_ram;
+inline void MBCwrite(uint16_t pointer, uint8_t value){
+  if (pointer < 0x2000 && has_ram) {
+      // Any write to 0000–1FFF → RAM enable
+    MBCFLAGS = value;
+    return;
+  } else if (pointer < 0x4000) {
+      // Any write to 2000–3FFF → ROM bank
+    rom_bank &= ~(0x1F);
+    //clear before setting
+    rom_bank |= value & 0x1F;
+    if (rom_bank == 0){rom_bank = 1;}
+    return;
+  } else if (pointer < 0x6000) {
+      //upper 2 bits
+    rom_bank &= 0x9F;
+    //clear before setting
+    rom_bank |= (value & 0x03) << 5;
+    return;
+  }
+}
+inline void Write(uint16_t pointer ,uint8_t value) {
+  if(pointer < 0x8000){MBCwrite(pointer, value); return;}
+  if(pointer > 0xDFFF && pointer < 0xFE00){data[pointer - 0x2000] = value; return;}
+  if(pointer > 0xFE9F && pointer < 0xFF00){std::cerr<<"Son this is unusable memory Sry"<<std::endl;}
+}
 inline uint8_t mbc_read(uint16_t addr) {
     switch(mbcType) {
         case 0x00:  // ROM ONLY
             return rom[addr];
-        default:
+        break;
+        case 0x01:
+        if (addr < 0x4000) {
+          return rom[addr];  // Fixed bank 0
+        } else {
+          return rom[(addr - 0x4000) + (rom_bank * 0x4000)];
+        }
+        break;
+        default: 
             return 0xFF;
+        break;
     }
 }
 inline uint8_t getData(uint16_t pointer) {

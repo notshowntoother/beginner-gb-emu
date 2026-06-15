@@ -5,10 +5,13 @@ extern uint8_t data[];
 extern uint8_t mbcType;
 extern size_t rom_size;
 extern uint8_t* rom;
+extern uint8_t* ram;
 extern uint8_t MBCFLAGS;
 extern uint8_t rom_bank;
+extern uint8_t ram_bank;
 extern uint8_t bank_size; //PLACEHOLDER
 extern bool has_ram;
+extern bool has_battery;
 inline void MBCwrite(uint16_t pointer, uint8_t value){
   if (pointer < 0x2000 && has_ram) {
       // Any write to 0000–1FFF → RAM enable
@@ -22,11 +25,15 @@ inline void MBCwrite(uint16_t pointer, uint8_t value){
     if (rom_bank == 0){rom_bank = 1;}
     return;
   } else if (pointer < 0x6000) {
-      //upper 2 bits
-    rom_bank &= 0x9F;
-    //clear before setting
-    rom_bank |= (value & 0x03) << 5;
-    return;
+    if(MBCFLAGS == 0x0A) {
+      ram_bank = value & 0x03;
+    } else {
+        //upper 2 bits
+      rom_bank &= 0x9F;
+      //clear before setting
+      rom_bank |= (value & 0x03) << 5;
+      return;
+    }
   }
 }
 inline void Write(uint16_t pointer ,uint8_t value) {

@@ -12,8 +12,13 @@ $(TARGET): $(OBJS) directories
 %.o: %.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-clean:
+clean-build:
 	rm -f $(TARGET) $(OBJS)
+	@echo "build files erased.""
+
+clean-directory:
+	rm -ri ~/gbemu
+	@echo " directories erased."
 
 run: $(TARGET)
 	./$(TARGET)

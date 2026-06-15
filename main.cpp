@@ -4,6 +4,7 @@
 #include <thread>
 #include <iostream>
 #include <cstdlib>
+#include <string>
 #include "instruction.h"
 bool progRuns = false;
 uint16_t PC = 0x100;
@@ -11,11 +12,14 @@ uint8_t opCycles[0xFF];
 uint8_t data[0x10000];
 uint8_t header[0x150];
 uint8_t* rom = nullptr;
+uint8_t* ram = nullptr; 
 uint8_t mbcType = 0;
 size_t rom_size = 0;
 bool has_ram = 0;
+bool has_battery = 0;
 uint8_t MBCFLAGS = 0x00;
 uint8_t rom_bank = 1;
+uint8_t ram_bank = 0;
 uint8_t bank_size = 0x3FFF;
 static const uint32_t CyclesPerFrame = 70224;
 int main(int argc, char* argv[]) {
@@ -48,23 +52,38 @@ int main(int argc, char* argv[]) {
   file.seekg(0);                    // go back to start
   file.read((char*)rom, rom_size);  // read entire ROM
   file.close();
+  int ram_size_code = header[0x149];
+  size_t ram_size = 0;
+  switch(ram_size_code) {
+    case 0x00: ram_size = 0; break;
+    case 0x01: ram_size = 2048; break;    // 2 KB (unused)
+    case 0x02: ram_size = 8192; break;    // 8 KB
+    case 0x03: ram_size = 32768; break;   // 32 KB
+    case 0x04: ram_size = 131072; break;  // 128 KB
+    case 0x05: ram_size = 65536; break;   // 64 KB
+  }
+  ram = new uint8_t[ram_size];
   mbcType = header[0x147];
   switch(mbcType) {
     case 0x00:
       std::cout<<"mbcType:none"<<std::endl;
       has_ram = 0;
+      has_battery = 0;
     break;
     case 0x01:
       std::cout<<"mbcType:1"<<std::endl;
       has_ram = 0;
+      has_battery = 0;
     break;
     case 0x02:
-      std::cout<<"mbcType:2"<<std::endl;
+      std::cout<<"mbcType:2,RAM"<<std::endl;
       has_ram = 1;
+      has_battery = 0;
     break;
     case 0x03:
-      std::cout<<"mbcType:3"<<std::endl;
+      std::cout<<"mbcType:3,RAM,Battery"<<std::endl;
       has_ram = 1;
+      has_battery = 1;
     break;
     default:
       std::cerr<<"Son we dont have that yet sry";
@@ -84,6 +103,18 @@ int main(int argc, char* argv[]) {
     }
     //execute code here
   }
+  //log ram to file here \/
+  if(has_battery) {
+    std::string basename = filename.substr(filename.find_last_of("/") + 1);
+    std::ofstream FILE_SAV(std::string(std::getenv("HOME")) + "/gbemu/saves/" + basename + ".sav", std::ios::binary);
+    if(FILE_SAV.is_open()) {
+      FILE_SAV.write((const char*)ram, ram_size);
+      FILE_SAV.close();
+    } else {
+      std::cerr<<"Son your saves are probably GONE"<<std::endl;
+    }
+  }
+  delete[] ram; 
   delete[] rom;
   return 0;
 }

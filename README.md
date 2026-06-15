@@ -12,3 +12,20 @@ make = just build it
 make directories = set directories
 make clean-build = remove build
 make clean-directory = remove directories INCLUDING SAVES
+## Features(and missing ones)
+[x]FDE loop
+[x]instructions=2
+[x]PC
+[x]some error handling
+[x]the 64kb data
+[x]ROM loading
+[x]Echo RAM(wow)
+[x]forbidden FEA0-FEFF(please do NOT use)
+[x]4 types of mbc with RAM enable+banking
+[x]Saving to RAM
+[]PPU
+[]more opcodes
+[]interrupts
+[]timer
+[]input
+[]audio(NOT PLANNING TO DO)

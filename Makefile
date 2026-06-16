@@ -1,12 +1,13 @@
 CXX = g++
-CXXFLAGS = -std=c++11 -Wall -Wextra -O2
+CXXFLAGS = -std=c++11 -Wall -Wextra -O2 $(shell sdl2-config --cflags)
 TARGET = gbemu
 SRCS = main.cpp
+LDFLAGS = $(shell sdl2-config --libs)
 OBJS = $(SRCS:.cpp=.o)
 
 $(TARGET): $(OBJS) directories
 	@echo "directories made!"
-	$(CXX) $(CXXFLAGS) -o $(TARGET) $(OBJS)
+	$(CXX) $(CXXFLAGS) -o $(TARGET) $(OBJS) $(LDFLAGS)
 	@echo "project compiled!"
 
 %.o: %.cpp

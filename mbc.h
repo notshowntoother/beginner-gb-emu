@@ -4,8 +4,10 @@
 extern uint8_t data[];
 extern uint8_t mbcType;
 extern size_t rom_size;
+extern size_t ram_size;
 extern uint8_t* rom;
 extern uint8_t* ram;
+extern bool mode;
 extern uint8_t MBCFLAGS;
 extern uint8_t rom_bank;
 extern uint8_t ram_bank;
@@ -25,7 +27,7 @@ inline void MBCwrite(uint16_t pointer, uint8_t value){
     if (rom_bank == 0){rom_bank = 1;}
     return;
   } else if (pointer < 0x6000) {
-    if(MBCFLAGS == 0x0A) {
+    if(mode) {
       ram_bank = value & 0x03;
     } else {
         //upper 2 bits
@@ -34,12 +36,24 @@ inline void MBCwrite(uint16_t pointer, uint8_t value){
       rom_bank |= (value & 0x03) << 5;
       return;
     }
+  } else if(pointer < 0x8000) {
+    mode = value & 0x01;
+    return;
+  }
+}
+inline void RAMwrite(uint16_t pointer, const uint8_t value) {
+  if(MBCFLAGS == 0x0A && ram_size > 0x2000 && mode) {
+    ram[(0x2000 * (ram_bank + 1)) + pointer % 0x2001] = value;
+  } else if (MBCFLAGS == 0x0A){
+    ram[pointer % 0x2001] = value;
   }
 }
 inline void Write(uint16_t pointer ,uint8_t value) {
   if(pointer < 0x8000){MBCwrite(pointer, value); return;}
   if(pointer > 0xDFFF && pointer < 0xFE00){data[pointer - 0x2000] = value; return;}
   if(pointer > 0xFE9F && pointer < 0xFF00){std::cerr<<"Son this is unusable memory Sry"<<std::endl;}
+  if(pointer < 0xC000 && pointer > 0x9FFF){RAMwrite(pointer - 0xA000, value); return;}
+  data[pointer] = value;
 }
 inline uint8_t mbc_read(uint16_t addr) {
     switch(mbcType) {

@@ -11,7 +11,7 @@ extern bool mode;
 extern uint8_t MBCFLAGS;
 extern uint8_t rom_bank;
 extern uint8_t ram_bank;
-extern uint8_t bank_size; //PLACEHOLDER
+extern uint16_t bank_size; //PLACEHOLDER
 extern bool has_ram;
 extern bool has_battery;
 inline void MBCwrite(uint16_t pointer, uint8_t value){
@@ -43,7 +43,7 @@ inline void MBCwrite(uint16_t pointer, uint8_t value){
 }
 inline void RAMwrite(uint16_t pointer, const uint8_t value) {
   if(MBCFLAGS == 0x0A && ram_size > 0x2000 && mode) {
-    ram[(0x2000 * (ram_bank + 1)) + pointer % 0x2001] = value;
+    ram[(0x2000 * (ram_bank)) + pointer % 0x2001] = value;
   } else if (MBCFLAGS == 0x0A){
     ram[pointer % 0x2001] = value;
   }

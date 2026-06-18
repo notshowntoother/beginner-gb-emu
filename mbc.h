@@ -42,10 +42,11 @@ inline void MBCwrite(uint16_t pointer, uint8_t value){
   }
 }
 inline void RAMwrite(uint16_t pointer, const uint8_t value) {
+  if(pointer > 0x2001){std::cerr<<"wrong pointer"<<std::endl; return;}
   if(MBCFLAGS == 0x0A && ram_size > 0x2000 && mode) {
     ram[(0x2000 * (ram_bank)) + pointer % 0x2001] = value;
   } else if (MBCFLAGS == 0x0A){
-    ram[pointer % 0x2001] = value;
+    ram[pointer] = value;
   }
 }
 inline void Write(uint16_t pointer ,uint8_t value) {

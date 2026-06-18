@@ -112,7 +112,9 @@ int main(int argc, char* argv[]) {
   SDL_RenderSetIntegerScale(renderer, SDL_TRUE);
   steady_clock::time_point acc = steady_clock::now();
   //load RAM save before running
-  
+  if(has_battery) {
+    std::string basename = filename.substr(fil    ename.find_last_of("/") + 1);
+    std::ifstream FILE_SAV(std::string(std::ge    tenv("HOME")) + "/gbemu/saves/" + basename + ".sav", std::ios::binary);
   uint32_t cycles = 0;
   while(progRuns) {
     std::this_thread::sleep_until(acc + nanoseconds(16666667));

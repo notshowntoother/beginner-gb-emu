@@ -30,10 +30,18 @@ uint8_t ram_bank = 0;
 uint16_t bank_size = 0x3FFF;
 static const uint32_t CyclesPerFrame = 70224;
 int main(int argc, char* argv[]) {
-  if (SDL_Init(SDL_INIT_VIDEO) <= 0) {
+  if (SDL_Init(SDL_INIT_VIDEO) < 0) {
     std::cerr << "Son there was a err with ye SDL2/SDL:" << SDL_GetError() << std::endl;
     return 4;
   }
+  SDL_Window* window = SDL_CreateWindow("Scaled SDL2 Screen",
+                                      SDL_WINDOWPOS_CENTERED,
+                                      SDL_WINDOWPOS_CENTERED,
+                                      320, 288,
+                                      SDL_WINDOW_SHOWN);
+  SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+  SDL_RenderSetLogicalSize(renderer, 160, 144);
+  SDL_RenderSetIntegerScale(renderer, SDL_TRUE);
   using namespace std::chrono;
   if(argc < 2) {
     std::cerr<<"son put arguments"<<std::endl;
@@ -97,31 +105,27 @@ int main(int argc, char* argv[]) {
     break;
     default:
       std::cerr<<"Son we dont have that yet sry";
-      return 2;
     break;
   }
   data[0x100] = 0x00;
   //add a jp instruction to 0x150 or wherever your project starts
-  SDL_Window* window = SDL_CreateWindow("Scaled SDL2 Screen",
-                                      SDL_WINDOWPOS_CENTERED,
-                                      SDL_WINDOWPOS_CENTERED,
-                                      320, 288,
-                                      SDL_WINDOW_SHOWN);
-  SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
-  SDL_RenderSetLogicalSize(renderer, 160, 144);
-  SDL_RenderSetIntegerScale(renderer, SDL_TRUE);
   steady_clock::time_point acc = steady_clock::now();
   //load RAM save before running
   if(has_battery) {
-    std::string basename = filename.substr(fil    ename.find_last_of("/") + 1);
-    std::ifstream FILE_SAV(std::string(std::ge    tenv("HOME")) + "/gbemu/saves/" + basename + ".sav", std::ios::binary);
+    std::string basename = filename.substr(filename.find_last_of("/") + 1);
+    std::ifstream FILE_SAV(std::string(std::getenv("HOME")) + "/gbemu/saves/" + basename + ".sav", std::ios::binary);
+  }
   uint32_t cycles = 0;
   while(progRuns) {
     std::this_thread::sleep_until(acc + nanoseconds(16666667));
     acc += nanoseconds(16666667);
     cycles = 0;
     while(cycles < CyclesPerFrame) {
-      cycles += FDE();
+      try {
+        cycles += FDE();
+      } catch(const std::runtime_error& e) {
+        std::cerr<<"Son you have a error:"<<e.what()<<std::endl;
+      }
     }
     //execute code here
   }

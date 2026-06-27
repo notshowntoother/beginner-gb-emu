@@ -6,6 +6,7 @@ LDFLAGS = $(shell sdl2-config --libs)
 OBJS = $(SRCS:.cpp=.o)
 
 $(TARGET): $(OBJS) directories
+	export SDL_VIDEODRIVER=cocoa
 	SECONDS=0
 	@echo "directories made!"
 	$(CXX) $(CXXFLAGS) -o $(TARGET) $(OBJS) $(LDFLAGS)
@@ -20,8 +21,10 @@ clean-build:
 	@echo "build files erased."
 
 clean-directory:
-	rm -ri ~/gbemu
-	@echo "directories erased."
+	rm -rf ~/gbemu
+
+clean-all: clean-build clean-directory
+	@echo "done!"
 
 run: $(TARGET)
 	./$(TARGET)

@@ -40,22 +40,22 @@ inline void LD_2_16(uint16_t& reggie) {
 inline void set_flags(bool z, bool n, bool h, bool c) {
   LD_L_REG(AF, static_cast<uint8_t>((z<<7)|(n<<6)|(h<<5)|(c<<4)));
 }
-inline void INC_H_REG(uint16_t% reggie) {
+inline void INC_H_REG(uint16_t& reggie) {
   if(RD_H_REG(reggie) + 1 == 0){
     AF |= (1 << 7); //set z flag
     LD_H_REG(reggie, 0); //overflow to 0
     return;
   }
-  LD_H_REG(reggie, RD_R_REG(reggie) + 1);
+  LD_H_REG(reggie, RD_H_REG(reggie) + 1);
   return;
 }
-inline void DEC_H_REG(uint16_t% reggie) {
-  if(RD_H_REG(reggie) + 1 == 0){
+inline void DEC_H_REG(uint16_t& reggie) {
+  if(RD_H_REG(reggie) - 1 == 0){
     AF |= (1 << 7); //set z flag
-    LD_H_REG(reggie, 0); //overflow to 0
+    LD_H_REG(reggie, 0);
     return;
   }
-  LD_H_REG(reggie, RD_R_REG(reggie) + 1);
+  LD_H_REG(reggie, RD_H_REG(reggie) - 1);
   return;
 }
 inline uint8_t fetchCOD() {
@@ -79,7 +79,7 @@ uint8_t DEX(uint8_t opcode) {
       return 8;
     break;
     case 0x04:
-      INC_H_REG(BC)
+      INC_H_REG(BC);
       return 4;
     break;
     case 0x05:
@@ -89,7 +89,7 @@ uint8_t DEX(uint8_t opcode) {
       return 16;
     break;
     default:
-      std::cerr<<"unknown/banned instruction:0x"<<opcode<<std::endl;
+    std::cerr<<"unknown/banned instruction(in decimal):"<<(int)opcode<<std::endl;
       throw std::runtime_error("wrong instruction!");
     break;
   }

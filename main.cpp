@@ -114,6 +114,10 @@ int main(int argc, char* argv[]) {
   if(has_battery) {
     std::string basename = filename.substr(filename.find_last_of("/") + 1);
     std::ifstream FILE_SAV(std::string(std::getenv("HOME")) + "/gbemu/saves/" + basename + ".sav", std::ios::binary);
+    if (FILE_SAV.is_open()) {
+      FILE_SAV.read((char*)ram, ram_size);
+      FILE_SAV.close();
+    }
   }
   uint32_t cycles = 0;
   while(progRuns) {
@@ -125,10 +129,12 @@ int main(int argc, char* argv[]) {
         cycles += FDE();
       } catch(const std::runtime_error& e) {
         std::cerr<<"Son you have a error:"<<e.what()<<std::endl;
+        goto end;
       }
     }
     //execute code here
   }
+  end:
   //log ram to file here \/
   if(has_battery) {
     std::string basename = filename.substr(filename.find_last_of("/") + 1);
@@ -140,8 +146,13 @@ int main(int argc, char* argv[]) {
       std::cerr<<"Son your saves are probably GONE"<<std::endl;
     }
   }
-  delete[] ram; 
-  delete[] rom;
+  if(ram != nullptr) {
+    delete[] ram; 
+    ram = nullptr;
+  }
+  if(rom != nullptr) {
+    delete[] rom;
+  }
   SDL_DestroyRenderer(renderer);
   SDL_DestroyWindow(window);
   SDL_Quit();

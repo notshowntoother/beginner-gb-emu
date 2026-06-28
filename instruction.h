@@ -83,13 +83,19 @@ uint8_t DEX(uint8_t opcode) {
       return 4;
     break;
     case 0x05:
-      
+      DEC_H_REG(BC);
+      return 4;
+    break;
+    case 0xAF:
+      AF &= 0x00FF;
+      return 4;
+    break;
     case 0xC3:
       LD_2_16(PC);
       return 16;
     break;
     default:
-    std::cerr<<"unknown/banned instruction(in decimal):"<<(int)opcode<<std::endl;
+    std::cerr<<"unknown/banned instruction:"<<std::hex<<(int)opcode<<std::endl;
       throw std::runtime_error("wrong instruction!");
     break;
   }

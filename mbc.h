@@ -7,7 +7,7 @@ extern size_t rom_size;
 extern size_t ram_size;
 extern uint8_t* rom;
 extern uint8_t* ram;
-extern bool mode;
+extern bool mbc_mode;
 extern uint8_t MBCFLAGS;
 extern uint8_t rom_bank;
 extern uint8_t ram_bank;
@@ -27,7 +27,7 @@ inline void MBCwrite(uint16_t pointer, uint8_t value){
     if (rom_bank == 0){rom_bank = 1;}
     return;
   } else if (pointer < 0x6000) {
-    if(mode) {
+    if(mbc_mode) {
       ram_bank = value & 0x03;
     } else {
         //upper 2 bits
@@ -37,13 +37,13 @@ inline void MBCwrite(uint16_t pointer, uint8_t value){
       return;
     }
   } else if(pointer < 0x8000) {
-    mode = value & 0x01;
+    mbc_mode = value & 0x01;
     return;
   }
 }
 inline void RAMwrite(uint16_t pointer, const uint8_t value) {
   if(pointer > 0x2001){std::cerr<<"wrong pointer"<<std::endl; return;}
-  if(MBCFLAGS == 0x0A && ram_size > 0x2000 && mode) {
+  if(MBCFLAGS == 0x0A && ram_size > 0x2000 && mbc_mode) {
     ram[(0x2000 * (ram_bank)) + pointer % 0x2001] = value;
   } else if (MBCFLAGS == 0x0A){
     ram[pointer] = value;

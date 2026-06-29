@@ -8,7 +8,8 @@
 #include <string>
 #include "instruction.h"
 bool progRuns = false;
-bool mode = 0;
+uint8_t mode = 0;
+bool mbc_mode = 0;
 uint16_t PC = 0x100;
 uint8_t opCycles[0xFF];
 uint8_t data[0x10000];

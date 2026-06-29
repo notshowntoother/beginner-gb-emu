@@ -95,7 +95,7 @@ uint8_t DEX(uint8_t opcode) {
       return 16;
     break;
     default:
-    std::cerr<<"unknown/banned instruction:"<<std::hex<<(int)opcode<<std::endl;
+      std::cerr<<"unknown/banned instruction:0x"<<std::hex<<(int)opcode<<" in decimal:"<<std::dec<<(int)opcode<<std::endl;
       throw std::runtime_error("wrong instruction!");
     break;
   }

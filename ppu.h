@@ -3,6 +3,15 @@
 extern uint8_t mode;
 extern uint8_t scanline;
 static uint8_t mode3_duration = 172;
+extern uint8_t data[];
+inline uint16_t decodeRow(uint8_t LSB, uint8_t MSB) {
+  uint16_t Row = 0;
+  for(uint16_t i = 7; i >= 0; --i) {
+    uint16_t pixel = static_cast<uint16_t>(((MSB & (1 << i)) >> (i - 1))|((LSB & (1 << i)) >> i));
+    Row |= (pixel << (i << 1));
+  }
+  return Row;
+}
 inline void ppu_event(uint8_t cycles) {
   ppu_cycles += cycles
   switch(mode){

@@ -7,6 +7,7 @@
 #include <cstdlib>
 #include <string>
 #include "instruction.h"
+#include "ppu.h"
 bool progRuns = false;
 uint8_t mode = 0;
 bool mbc_mode = 0;
@@ -127,9 +128,12 @@ int main(int argc, char* argv[]) {
     cycles = 0;
     while(cycles < CyclesPerFrame) {
       try {
-        cycles += FDE();
+        uint8_t insCycles = FDE();
+        cycles += insCycles;
+        ppu_event(insCycles);
       } catch(const std::runtime_error& e) {
         std::cerr<<"Son you have a error:"<<e.what()<<std::endl;
+        progRuns = 0;
         goto end;
       }
     }

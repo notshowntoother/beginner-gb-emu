@@ -7,10 +7,23 @@ extern uint8_t data[];
 inline uint16_t decodeRow(uint8_t LSB, uint8_t MSB) {
   uint16_t Row = 0;
   for(uint16_t i = 7; i >= 0; --i) {
-    uint16_t pixel = static_cast<uint16_t>(((MSB & (1 << i)) >> (i - 1))|((LSB & (1 << i)) >> i));
+    uint16_t pixel = static_cast<uint16_t>((((MSB & (1 << i)) >> i) << 1)|((LSB & (1 << i)) >> i));
     Row |= (pixel << (i << 1));
   }
   return Row;
+}
+inline uint8_t* getTileAddr(uint8_t tileIndex, bool usingSigned) {
+  uint8_t* point;
+  if(usingSigned) {
+    if(tileIndex < 0x80) {
+      point = &data[(tileIndex * 16) + 0x9000];
+    } else if(tileIndex > 0x7F) {
+      point = &data[((tileIndex - 0x80) * 16) + 0x8800];
+    }
+  } else {
+    point = &data[(tileIndex * 16) + 0x8000];
+  }
+  return point;
 }
 inline void ppu_event(uint8_t cycles) {
   ppu_cycles += cycles

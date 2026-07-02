@@ -45,7 +45,7 @@ inline void INC_H_REG(uint16_t& reggie) {
     AF |= (1 << 7); //set z flag
     LD_H_REG(reggie, 0); //overflow to 0
     return;
-  }
+  } else {AF &= ~(0x80);}
   LD_H_REG(reggie, RD_H_REG(reggie) + 1);
   return;
 }

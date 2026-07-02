@@ -111,7 +111,6 @@ int main(int argc, char* argv[]) {
   }
   data[0x100] = 0x00;
   //add a jp instruction to 0x150 or wherever your project starts
-  steady_clock::time_point acc = steady_clock::now();
   //load RAM save before running
   if(has_battery) {
     std::string basename = filename.substr(filename.find_last_of("/") + 1);
@@ -122,8 +121,8 @@ int main(int argc, char* argv[]) {
     }
   }
   uint32_t cycles = 0;
+  steady_clock::time_point acc = steady_clock::now();
   while(progRuns) {
-    std::this_thread::sleep_until(acc + nanoseconds(16666667));
     acc += nanoseconds(16666667);
     cycles = 0;
     while(cycles < CyclesPerFrame) {
@@ -138,6 +137,7 @@ int main(int argc, char* argv[]) {
       }
     }
     //execute code here
+    std::this_thread::sleep_until(acc + nanoseconds(16666667));
   }
   end:
   //log ram to file here \/

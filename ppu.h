@@ -31,12 +31,14 @@ inline void ppu_event(uint8_t cycles) {
     case 1:
       if(ppu_cycles >= 4560) {
         mode = 2;
+        ppu_cycles -= 4560;
       }
     break;
     case 2:
       if(ppu_cycles >= 80) {
         //scan
         mode = 3;
+        ppu_cycles -= 80;
       }
     break;
     case 3:
@@ -44,10 +46,12 @@ inline void ppu_event(uint8_t cycles) {
         mode = 0;
         HBlank = 1;
         ++scanline;
+        ppu_cycles -= mode3_duration;
       }
     break;
     case 0:
       if(ppu_cycles >= (376 - mode3_duration)) {
+        ppu_cycles -= (376 - mode3_duration);
          if(scanline > 144){
            mode = 1;
            VBlank = 1;

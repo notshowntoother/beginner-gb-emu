@@ -4,7 +4,17 @@ extern uint8_t mode;
 extern uint8_t scanline;
 static uint8_t mode3_duration = 172;
 extern uint8_t data[];
-inline uint16_t decodeRow(uint8_t LSB, uint8_t MSB) {
+/* so, Sprites in OAM are structured into 4 bytes, the x position, the y position, the index of the tile used, and the flags of the sprite.
+the bits of the last byte(called the "flags") determines how the sprite will be drawn, this is the bits and their usage in drawing
+bit|usage
+7|Priority of render
+6|Y flip
+5|X flip
+4|Palette
+3|Bank(CGB ONLY!)
+2-0|Palette number(CGB ONLY!)
+*/
+inline uint16_t decodeTile(uint8_t LSB, uint8_t MSB) {
   uint16_t Row = 0;
   for(uint16_t i = 7; i >= 0; --i) {
     uint16_t pixel = static_cast<uint16_t>((((MSB & (1 << i)) >> i) << 1)|((LSB & (1 << i)) >> i));

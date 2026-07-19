@@ -86,6 +86,14 @@ uint8_t DEX(uint8_t opcode) {
       DEC_H_REG(BC);
       return 4;
     break;
+    case 0x06:
+      LD_H_REG(BC, fetchCOD());
+      return 8;
+    break;
+    case 0x09:
+      HL += BC;
+      return 8;
+    break;
     case 0xAF:
       AF &= 0x00FF;
       return 4;

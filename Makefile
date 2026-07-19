@@ -1,3 +1,4 @@
+SHELL := /bin/zsh
 CXX = g++
 CXXFLAGS = -std=c++11 -Wall -Wextra -O2 $(shell sdl2-config --cflags)
 TARGET = gbemu
@@ -7,11 +8,9 @@ OBJS = $(SRCS:.cpp=.o)
 
 $(TARGET): $(OBJS) directories
 	export SDL_VIDEODRIVER=cocoa
-	SECONDS=0
 	@echo "directories made!"
 	$(CXX) $(CXXFLAGS) -o $(TARGET) $(OBJS) $(LDFLAGS)
 	@echo "project compiled!"
-	@echo "build time: $$SECONDS seconds"
 
 %.o: %.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@

@@ -44,7 +44,7 @@ inline void MBCwrite(uint16_t pointer, uint8_t value){
 inline void RAMwrite(uint16_t pointer, const uint8_t value) {
   if(pointer > 0x2001){std::cerr<<"wrong pointer"<<std::endl; return;}
   if(MBCFLAGS == 0x0A && ram_size > 0x2000 && mbc_mode) {
-    ram[(0x2000 * (ram_bank)) + pointer % 0x2001] = value;
+    ram[(0x2000 * (ram_bank)) + pointer & 0x1FFF] = value;
   } else if (MBCFLAGS == 0x0A){
     ram[pointer] = value;
   }
@@ -52,7 +52,7 @@ inline void RAMwrite(uint16_t pointer, const uint8_t value) {
 inline void Write(uint16_t pointer ,uint8_t value) {
   if(pointer < 0x8000){MBCwrite(pointer, value); return;}
   if(pointer > 0xDFFF && pointer < 0xFE00){data[pointer - 0x2000] = value; return;}
-  if(pointer > 0xBFFF && pointer < 0xE000){data[pointer] = value; return}
+  if(pointer > 0xBFFF && pointer < 0xE000){data[pointer] = value; return;}
   if(pointer > 0xFE9F && pointer < 0xFF00){std::cerr<<"Son this is unusable memory Sry"<<std::endl;}
   if(pointer < 0xC000 && pointer > 0x9FFF){RAMwrite(pointer - 0xA000, value); return;}
   data[pointer] = value;
@@ -74,12 +74,18 @@ inline uint8_t mbc_read(uint16_t addr) {
         break;
     }
 }
+inline uint8_t RAMread(uint16_t pointer) {
+  if(MBCFLAGS != 0x0A || !has_ram) {
+    return 0xFF;
+  }
+  return ram[(0x2000 * (ram_bank)) + pointer & 0x1FFF];
+}
 inline uint8_t getData(uint16_t pointer) {
   if (pointer < 0x8000) {
     return mbc_read(pointer);
   }
   if (pointer > 0x9FFF && pointer < 0xC000) {
-    RAMread(pointer);
+    return RAMread(pointer - 0xA000);
   }
   return data[pointer];
 }

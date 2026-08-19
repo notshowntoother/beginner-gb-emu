@@ -3,8 +3,11 @@
 #include <cstdint>
 extern uint8_t mode;
 extern uint8_t scanline;
-static uint8_t mode3_duration = 172;
+extern uint32_t ppu_cycles;
+extern uint8_t mode3_duration;
 extern uint8_t data[];
+extern bool VBlank;
+extern bool HBlank;
 /* so, Sprites in OAM are structured into 4 bytes, the x position, the y position, the index of the tile used, and the flags of the sprite.
 the bits of the last byte(called the "flags") determines how the sprite will be drawn, this is the bits and their usage in drawing
 bit|usage
@@ -15,6 +18,8 @@ bit|usage
 3|Bank(CGB ONLY!)
 2-0|Palette number(CGB ONLY!)
 */
+//sprite rendering x = x - 8
+//sprite rendering y = y - 16
 inline uint16_t decodeTile(uint8_t LSB, uint8_t MSB) {
   uint16_t Row = 0;
   for(int16_t i = 7; i >= 0; --i) {
@@ -37,7 +42,7 @@ inline uint8_t* getTileAddr(uint8_t tileIndex, bool usingSigned) {
   return point;
 }
 inline void ppu_event(uint8_t cycles) {
-  ppu_cycles += cycles
+  ppu_cycles += cycles;
   switch(mode){
     case 1:
       if(ppu_cycles >= 4560) {

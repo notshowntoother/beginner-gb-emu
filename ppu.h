@@ -20,6 +20,10 @@ bit|usage
 */
 //sprite rendering x = x - 8
 //sprite rendering y = y - 16
+/* ok so I feel like i got a revelation
+if you want to know what tile you are on vertically and you have the
+absolute scanline row number(scanline number + SCY) you can do absolute row/8
+if you want to know what part of the tile vertically you do absolute row % 8*/
 inline uint16_t decodeTile(uint8_t LSB, uint8_t MSB) {
   uint16_t Row = 0;
   for(int16_t i = 7; i >= 0; --i) {
@@ -68,7 +72,7 @@ inline void ppu_event(uint8_t cycles) {
     case 0:
       if(ppu_cycles >= (376 - mode3_duration)) {
         ppu_cycles -= (376 - mode3_duration);
-         if(scanline > 144){
+         if(scanline == 144){
            mode = 1;
            VBlank = 1;
          }else{

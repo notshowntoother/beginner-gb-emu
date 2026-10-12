@@ -45,7 +45,9 @@ inline void INC_H_REG(uint16_t& reggie) {
     AF |= (1 << 7); //set z flag
     LD_H_REG(reggie, 0); //overflow to 0
     return;
-  } else {AF &= ~(0x80);}
+  } 
+  if(((RD_H_REG(reggie) + 1) & 0x0F) == 0){AF |= (1 << 5);}
+  AF &= ~(1 << 6);
   LD_H_REG(reggie, RD_H_REG(reggie) + 1);
   return;
 }
@@ -64,21 +66,21 @@ inline uint8_t fetchCOD() {
 //DE(decode, execute)
 uint8_t DEX(uint8_t opcode) {
   switch(opcode) {
-    case 0x00:
+    case 0x00://flags ok
       return 0x04;
     break;
-    case 0x01:
+    case 0x01://flags ok
       LD_2_16(BC);
       return 12;
     break;
-    case 0x02:
+    case 0x02://flags ok
       Write(BC, RD_L_REG(AF));
       return 8;
-    case 0x03:
+    case 0x03://flags ok
       ++BC;
       return 8;
     break;
-    case 0x04:
+    case 0x04://flags ok
       INC_H_REG(BC);
       return 4;
     break;

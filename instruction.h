@@ -46,7 +46,7 @@ inline void INC_H_REG(uint16_t& reggie) {
     LD_H_REG(reggie, 0); //overflow to 0
     return;
   } 
-  if(((RD_H_REG(reggie) + 1) & 0x0F) == 0){AF |= (1 << 5);}
+  if(((RD_H_REG(reggie) + 1) & 0x0F) == 0){AF |= (1 << 5);} else {AF &= ~(1 << 5);}
   AF &= ~(1 << 6);
   LD_H_REG(reggie, RD_H_REG(reggie) + 1);
   return;
@@ -57,6 +57,8 @@ inline void DEC_H_REG(uint16_t& reggie) {
     LD_H_REG(reggie, 0);
     return;
   }
+  AF |= (1 << 6);
+  if((reggie & 0x0F) == 0){AF |= (1 << 5);} else {AF &= ~(1 << 5);}
   LD_H_REG(reggie, RD_H_REG(reggie) - 1);
   return;
 }
@@ -84,7 +86,7 @@ uint8_t DEX(uint8_t opcode) {
       INC_H_REG(BC);
       return 4;
     break;
-    case 0x05:
+    case 0x05://flags ok
       DEC_H_REG(BC);
       return 4;
     break;

@@ -65,6 +65,9 @@ inline void DEC_H_REG(uint16_t& reggie) {
 inline uint8_t fetchCOD() {
   return getData(PC++);
 }
+inline void ADD_16_REG(uint16_t& reggie, uint16_t regger){
+  reggie += regger;
+}
 //DE(decode, execute)
 uint8_t DEX(uint8_t opcode) {
   switch(opcode) {
@@ -90,7 +93,7 @@ uint8_t DEX(uint8_t opcode) {
       DEC_H_REG(BC);
       return 4;
     break;
-    case 0x06:
+    case 0x06://flags ok 
       LD_H_REG(BC, fetchCOD());
       return 8;
     break;
